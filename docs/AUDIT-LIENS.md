@@ -1,8 +1,8 @@
 # Rapport d'Audit & Nettoyage des Liens et Boutons - NOCIBÉ
 
 Date d'audit : 2026-10-22
-Périmètre audité : 97 fichiers source TypeScript / React (`src/`).
-Éléments audités : 259 balises `<button>` et 104 balises `<a>` / `<Link>`.
+Périmètre audité : 114 fichiers source TypeScript / React (`src/`).
+Éléments audités : 260 balises `<button>` et 104 balises `<a>` / `<Link>`.
 
 ## 1. Synthèse de l'Audit
 - **Boutons sans action ou `onClick={() => {}}`** : 0 identifiés et traités.
