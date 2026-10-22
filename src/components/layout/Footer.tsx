@@ -1,13 +1,15 @@
 import React from 'react';
 import { SITE_CONFIG, LOCATIONS } from '../../config/site';
 import { Logo } from '../ui/Logo';
+import { Stagger, StaggerItem } from '../motion/Stagger';
+import { Reveal } from '../motion/Reveal';
 import {
   MapPin,
   Phone,
   EnvelopeSimple,
   ShieldCheck,
   CheckCircle,
-  ArrowUpRight
+  ArrowUpRight,
 } from '@phosphor-icons/react';
 import { FaLinkedinIn, FaFacebookF } from 'react-icons/fa6';
 import { IconCementBag } from '../icons/IndustryIcons';
@@ -19,11 +21,14 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
   return (
-    <footer className="bg-[#07142A] text-slate-300 pt-16 pb-24 md:pb-12 border-t-[3px] border-[#0131FD] relative z-10">
+    <footer className="bg-[#07142A] text-slate-300 pt-16 pb-24 md:pb-12 rounded-t-3xl md:rounded-t-[44px] border-t-[3px] border-[#0131FD] relative z-10 shadow-2xl overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-slate-800">
+        <Stagger
+          staggerDelay={0.08}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-slate-800"
+        >
           {/* Col 1: Brand with white pill logo & Certifications (4 cols) */}
-          <div className="lg:col-span-4 space-y-5">
+          <StaggerItem className="lg:col-span-4 space-y-5">
             <Logo variant="footer" />
 
             <p className="text-sm text-slate-300 leading-relaxed max-w-sm pt-2">
@@ -63,10 +68,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
                 <FaFacebookF size={14} />
               </a>
             </div>
-          </div>
+          </StaggerItem>
 
           {/* Col 2: Ciments & Solutions (3 cols) */}
-          <div className="lg:col-span-3 space-y-4">
+          <StaggerItem className="lg:col-span-3 space-y-4">
             <h4 className="text-white font-bold text-sm tracking-wider uppercase font-sans border-l-2 border-[#0131FD] pl-2.5">
               Ciments & Solutions
             </h4>
@@ -121,10 +126,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
                 </button>
               </li>
             </ul>
-          </div>
+          </StaggerItem>
 
           {/* Col 3: L'Entreprise & Engagement (2 cols) */}
-          <div className="lg:col-span-2 space-y-4">
+          <StaggerItem className="lg:col-span-2 space-y-4">
             <h4 className="text-white font-bold text-sm tracking-wider uppercase font-sans border-l-2 border-[#0131FD] pl-2.5">
               L'Entreprise
             </h4>
@@ -198,20 +203,29 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
                   onClick={() => onNavigate('outlets')}
                   className="hover:text-[#00CCFF] transition"
                 >
-                  Points de vente & Dépôts
+                  Réseau de distribution
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('contact')}
+                  className="hover:text-[#00CCFF] transition"
+                >
+                  Nous contacter
                 </button>
               </li>
             </ul>
-          </div>
+          </StaggerItem>
 
-          {/* Col 4: Implantations & Coordonnées (3 cols) */}
-          <div className="lg:col-span-3 space-y-4">
+          {/* Col 4: Siège & Usine (3 cols) */}
+          <StaggerItem className="lg:col-span-3 space-y-4">
             <h4 className="text-white font-bold text-sm tracking-wider uppercase font-sans border-l-2 border-[#0131FD] pl-2.5">
-              Implantations Bénin
+              Siège & Usine
             </h4>
-            <div className="space-y-3.5 text-xs">
+            <div className="space-y-3 text-xs">
               <div className="flex items-start gap-2.5">
-                <MapPin size={18} weight="fill" className="text-slate-400 shrink-0 mt-0.5" />
+                <MapPin size={16} weight="fill" className="text-[#0131FD] shrink-0 mt-0.5" />
                 <div>
                   <a
                     href={LOCATIONS.masse.mapsUrl}
@@ -226,7 +240,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
               </div>
 
               <div className="flex items-start gap-2.5">
-                <MapPin size={18} weight="fill" className="text-slate-400 shrink-0 mt-0.5" />
+                <MapPin size={16} weight="fill" className="text-[#00CCFF] shrink-0 mt-0.5" />
                 <div>
                   <a
                     href={LOCATIONS.cotonou.mapsUrl}
@@ -260,11 +274,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
                 </a>
               </div>
             </div>
-          </div>
-        </div>
+          </StaggerItem>
+        </Stagger>
 
-        {/* Bottom Bar: Copyright, Mentions légales, Démo notice */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        {/* Bottom Bar: Copyright, Mentions légales */}
+        <Reveal
+          variant="fadeIn"
+          delay={0.2}
+          className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4"
+        >
           <p>
             &copy; {new Date().getFullYear()} NOCIBÉ (Nouvelle Cimenterie du Bénin). Tous droits réservés.
           </p>
@@ -286,14 +304,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenQuote }) => {
               Politique de Confidentialité
             </button>
             <span>&bull;</span>
-            <span className="text-slate-500">Ciments certifiés EN 197-1</span>
+            <span className="text-slate-400">Ciments certifiés EN 197-1</span>
             <span>&bull;</span>
-            <span className="text-amber-500/80 font-medium text-[11px]">
-              Version de démonstration
+            <span className="text-[#00CCFF] font-medium text-[11px]">
+              Excellence industrielle béninoise
             </span>
           </div>
-        </div>
+        </Reveal>
       </div>
     </footer>
   );
 };
+
+export default Footer;
