@@ -20,6 +20,7 @@ Ce document dresse l'inventaire exhaustif de tous les contenus à remplacer par 
 | `src/data/projects.ts` | Chantiers emblématiques (Échangeur de Vèdoko, Port de Cotonou...) | Liste contractuelle des réalisations de référence construites avec le ciment NOCIBÉ |
 | `src/data/team.ts` | Noms et fonctions de la direction générale et usine | Trombinoscope officiel et biographies validées par les ressources humaines |
 | `src/pages/LegalPage.tsx` | Mentions légales types (RCCM fictif, IFU provisoire) | Numéro RCCM officiel, IFU réel, capital social enregistré au greffe du tribunal de commerce de Cotonou |
+| `src/components/layout/TopBar.tsx` | Messages défilants Marquee (« Ciment certifié EN 197-1 », « Usine intégrée de Massé », « Livraison en sacs et en vrac », « Normes ISO 9001 & ISO 14001 », « Capacité 1,5 M tonnes/an ») | Validation des arguments clés et mentions promotionnelles officielles par la direction générale et communication |
 | `server/.env` | `SEED_ADMIN_EMAIL` et `SEED_ADMIN_PASSWORD` de développement | Comptes administrateurs réels avec mots de passe complexes et 2FA obligatoire |
 
 ---
