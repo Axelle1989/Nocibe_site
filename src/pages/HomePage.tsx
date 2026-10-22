@@ -7,6 +7,7 @@ import { SectionHeader } from '../components/ui/SectionHeader';
 import { CountUp } from '../components/ui/CountUp';
 import { CTA } from '../components/home/CTA';
 import { SafeImage } from '../components/ui/SafeImage';
+import { CurvedDivider } from '../components/motion/CurvedDivider';
 import { NavPage } from '../components/layout/Header';
 import {
   ShieldCheck,
@@ -141,6 +142,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenQuote }) =
             </div>
           </div>
         </div>
+
+        {/* Transition courbe vers la section suivante */}
+        <CurvedDivider variant="convex" color="#FFFFFF" height={44} position="bottom" />
       </section>
 
       {/* =========================================================
