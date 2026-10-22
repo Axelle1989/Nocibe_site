@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Outlet, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { RequireAuth, RequireVerifiedUser, RequireAdmin } from './components/auth/RequireAuth';
+import { ScrollProgress } from './components/motion/ScrollProgress';
 
 // Layouts
 import { TopBar } from './components/layout/TopBar';
@@ -83,6 +85,8 @@ function PublicLayout({ onOpenQuote }: { onOpenQuote: (productId?: string) => vo
         }
       }, 100);
       return () => clearTimeout(timer);
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
   }, [location.pathname, location.hash]);
 
@@ -206,6 +210,9 @@ function PublicLayout({ onOpenQuote }: { onOpenQuote: (productId?: string) => vo
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0F172A] selection:bg-[#0131FD] selection:text-white relative font-sans">
+      {/* Barre de progression de lecture globale */}
+      <ScrollProgress />
+
       <TopBar
         language={language}
         onToggleLanguage={() => setLanguage((prev) => (prev === 'fr' ? 'en' : 'fr'))}
@@ -217,8 +224,19 @@ function PublicLayout({ onOpenQuote }: { onOpenQuote: (productId?: string) => vo
         onOpenSearch={() => setSearchModalOpen(true)}
       />
 
-      <main className="flex-1 w-full pb-20 md:pb-0">
-        <Outlet context={{ handleNavigate, onOpenQuote }} />
+      <main className="flex-1 w-full pb-20 md:pb-0 overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full flex-1 flex flex-col"
+          >
+            <Outlet context={{ handleNavigate, onOpenQuote }} />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <Footer
