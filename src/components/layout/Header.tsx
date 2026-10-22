@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from '../ui/Logo';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { MagneticButton } from '../motion/MagneticButton';
 import {
   List,
   X,
@@ -118,10 +120,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-white transition-all duration-300 border-b ${
+      className={`sticky top-0 z-40 bg-white/95 backdrop-blur-md transition-all duration-300 border-b ${
         isScrolled
-          ? 'shadow-md border-slate-200/80 h-[72px] lg:h-24'
-          : 'border-slate-100 h-[72px] lg:h-24'
+          ? 'shadow-md shadow-slate-900/5 border-slate-200/80 h-[64px] lg:h-[72px]'
+          : 'border-slate-100 h-[72px] lg:h-[88px]'
       }`}
     >
       <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 h-full flex items-center justify-between gap-1 sm:gap-2 min-w-0">
@@ -135,17 +137,26 @@ export const Header: React.FC<HeaderProps> = ({
           className="hidden xl:flex items-center gap-0.5 2xl:gap-1 text-[12px] 2xl:text-[13px] font-semibold text-slate-700 whitespace-nowrap"
         >
           {/* Accueil */}
-          <button
-            type="button"
-            onClick={() => handleNavClick('home')}
-            className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
-              currentPage === 'home'
-                ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                : 'hover:text-[#0B1F3A] hover:bg-slate-50'
-            }`}
-          >
-            Accueil
-          </button>
+          <div className="relative inline-flex items-center">
+            {currentPage === 'home' && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => handleNavClick('home')}
+              className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
+                currentPage === 'home'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
+              }`}
+            >
+              Accueil
+            </button>
+          </div>
 
           {/* À propos ▾ (clic libellé = /histoire, chevron = sous-menu) */}
           <div
@@ -153,13 +164,20 @@ export const Header: React.FC<HeaderProps> = ({
             onMouseEnter={() => setActiveDropdown('about')}
             onMouseLeave={() => setActiveDropdown(null)}
           >
+            {['history', 'team', 'factory'].includes(currentPage) && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
             <button
               type="button"
               onClick={() => handleNavClick('history')}
               className={`px-1.5 2xl:px-2 py-1 2xl:py-1.5 rounded-l-lg transition whitespace-nowrap ${
                 ['history', 'team', 'factory'].includes(currentPage)
-                  ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                  : 'hover:text-[#0B1F3A] hover:bg-slate-50'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               À propos
@@ -171,49 +189,61 @@ export const Header: React.FC<HeaderProps> = ({
               aria-haspopup="menu"
               aria-label="Sous-menu À propos"
               className={`p-1 2xl:p-1.5 rounded-r-lg transition ${
-                activeDropdown === 'about' ? 'text-[#0131FD] bg-slate-100' : 'text-slate-500 hover:text-[#0B1F3A] hover:bg-slate-50'
+                activeDropdown === 'about'
+                  ? 'text-[#0131FD]'
+                  : ['history', 'team', 'factory'].includes(currentPage)
+                  ? 'text-[#0131FD]'
+                  : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               <CaretDown size={11} weight="bold" className={activeDropdown === 'about' ? 'rotate-180 text-[#0131FD]' : ''} />
             </button>
 
-            {activeDropdown === 'about' && (
-              <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('history')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+            <AnimatePresence>
+              {activeDropdown === 'about' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                  transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                 >
-                  <Scroll size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre histoire</div>
-                    <div className="text-[11px] text-slate-500">De 2013 à nos jours & Mot du DG</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('team')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <Users size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre équipe</div>
-                    <div className="text-[11px] text-slate-500">Direction, Missions & Valeurs</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('factory')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <Factory size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">L'usine de Massé</div>
-                    <div className="text-[11px] text-slate-500">Four à 1 450 °C & Laboratoire</div>
-                  </div>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('history')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Scroll size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre histoire</div>
+                      <div className="text-[11px] text-slate-500">De 2013 à nos jours & Mot du DG</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('team')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Users size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre équipe</div>
+                      <div className="text-[11px] text-slate-500">Direction, Missions & Valeurs</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('factory')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Factory size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">L'usine de Massé</div>
+                      <div className="text-[11px] text-slate-500">Four à 1 450 °C & Laboratoire</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Produits ▾ (clic libellé = /produits, chevron = sous-menu) */}
@@ -222,13 +252,20 @@ export const Header: React.FC<HeaderProps> = ({
             onMouseEnter={() => setActiveDropdown('products')}
             onMouseLeave={() => setActiveDropdown(null)}
           >
+            {['products', 'product-detail', 'specs'].includes(currentPage) && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
             <button
               type="button"
               onClick={() => handleNavClick('products')}
               className={`px-1.5 2xl:px-2 py-1 2xl:py-1.5 rounded-l-lg transition whitespace-nowrap ${
-                ['products', 'product-detail'].includes(currentPage)
-                  ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                  : 'hover:text-[#0B1F3A] hover:bg-slate-50'
+                ['products', 'product-detail', 'specs'].includes(currentPage)
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               Produits
@@ -240,66 +277,94 @@ export const Header: React.FC<HeaderProps> = ({
               aria-haspopup="menu"
               aria-label="Sous-menu Produits"
               className={`p-1 2xl:p-1.5 rounded-r-lg transition ${
-                activeDropdown === 'products' ? 'text-[#0131FD] bg-slate-100' : 'text-slate-500 hover:text-[#0B1F3A] hover:bg-slate-50'
+                activeDropdown === 'products'
+                  ? 'text-[#0131FD]'
+                  : ['products', 'product-detail', 'specs'].includes(currentPage)
+                  ? 'text-[#0131FD]'
+                  : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               <CaretDown size={11} weight="bold" className={activeDropdown === 'products' ? 'rotate-180 text-[#0131FD]' : ''} />
             </button>
 
-            {activeDropdown === 'products' && (
-              <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('products')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+            <AnimatePresence>
+              {activeDropdown === 'products' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                  transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                 >
-                  <ShieldCheck size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre gamme</div>
-                    <div className="text-[11px] text-slate-500">CPJ 35, CPJ 45, CPA 55, Vrac</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('specs')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <FileText size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Spécifications techniques</div>
-                    <div className="text-[11px] text-slate-500">Tableau comparatif & Fiches PDF</div>
-                  </div>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('products')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <ShieldCheck size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Notre gamme</div>
+                      <div className="text-[11px] text-slate-500">CPJ 35, CPJ 45, CPA 55, Vrac</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('specs')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <FileText size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Spécifications techniques</div>
+                      <div className="text-[11px] text-slate-500">Tableau comparatif & Fiches PDF</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Nos réalisations (remplace « Nos clients ») */}
-          <button
-            type="button"
-            onClick={() => handleNavClick('realisations')}
-            className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
-              currentPage === 'realisations'
-                ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                : 'hover:text-[#0B1F3A] hover:bg-slate-50'
-            }`}
-          >
-            Nos réalisations
-          </button>
+          {/* Nos réalisations */}
+          <div className="relative inline-flex items-center">
+            {currentPage === 'realisations' && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => handleNavClick('realisations')}
+              className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
+                currentPage === 'realisations'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
+              }`}
+            >
+              Nos réalisations
+            </button>
+          </div>
 
-          {/* Engagement ▾ (clic libellé = /objectifs-2030, chevron = sous-menu) */}
+          {/* Engagement ▾ */}
           <div
             className="relative flex items-center"
             onMouseEnter={() => setActiveDropdown('engagement')}
             onMouseLeave={() => setActiveDropdown(null)}
           >
+            {['objectifs-2030', 'securite-qualite', 'sustainability'].includes(currentPage) && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
             <button
               type="button"
               onClick={() => handleNavClick('objectifs-2030')}
               className={`px-1.5 2xl:px-2 py-1 2xl:py-1.5 rounded-l-lg transition whitespace-nowrap ${
-                ['objectifs-2030', 'securite-qualite'].includes(currentPage)
-                  ? 'text-[#0131FD] bg-[#EBF3FF] font-bold'
-                  : 'hover:text-[#0131FD] hover:bg-slate-50'
+                ['objectifs-2030', 'securite-qualite', 'sustainability'].includes(currentPage)
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               Engagement
@@ -311,68 +376,87 @@ export const Header: React.FC<HeaderProps> = ({
               aria-haspopup="menu"
               aria-label="Sous-menu Engagement"
               className={`p-1 2xl:p-1.5 rounded-r-lg transition ${
-                activeDropdown === 'engagement' ? 'text-[#0131FD] bg-[#EBF3FF]' : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50'
+                activeDropdown === 'engagement'
+                  ? 'text-[#0131FD]'
+                  : ['objectifs-2030', 'securite-qualite', 'sustainability'].includes(currentPage)
+                  ? 'text-[#0131FD]'
+                  : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               <CaretDown size={11} weight="bold" className={activeDropdown === 'engagement' ? 'rotate-180 text-[#0131FD]' : ''} />
             </button>
 
-            {activeDropdown === 'engagement' && (
-              <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('objectifs-2030')}
-                  className={`w-full text-left p-2.5 rounded-xl flex items-center gap-3 group transition ${
-                    currentPage === 'objectifs-2030' ? 'bg-[#EBF3FF] text-[#0131FD]' : 'hover:bg-slate-50'
-                  }`}
+            <AnimatePresence>
+              {activeDropdown === 'engagement' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                  transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                 >
-                  <ArrowsClockwise size={18} className="text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Objectifs 2030</div>
-                    <div className="text-[11px] text-slate-500">Jauges & Décarbonation</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('sustainability')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <Tree size={18} className="text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Actions de terrain</div>
-                    <div className="text-[11px] text-slate-500">Reboisement & Forages Massé</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('securite-qualite')}
-                  className={`w-full text-left p-2.5 rounded-xl flex items-center gap-3 group transition ${
-                    currentPage === 'securite-qualite' ? 'bg-[#EBF3FF] text-[#0131FD]' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <ShieldCheck size={18} className="text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Sécurité & qualité</div>
-                    <div className="text-[11px] text-slate-500">Zéro accident & Norme EN 197-1</div>
-                  </div>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('objectifs-2030')}
+                    className={`w-full text-left p-2.5 rounded-xl flex items-center gap-3 group transition ${
+                      currentPage === 'objectifs-2030' ? 'bg-[#EBF3FF] text-[#0131FD]' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <ArrowsClockwise size={18} className="text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Objectifs 2030</div>
+                      <div className="text-[11px] text-slate-500">Jauges & Décarbonation</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('sustainability')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Tree size={18} className="text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Actions de terrain</div>
+                      <div className="text-[11px] text-slate-500">Reboisement & Forages Massé</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('securite-qualite')}
+                    className={`w-full text-left p-2.5 rounded-xl flex items-center gap-3 group transition ${
+                      currentPage === 'securite-qualite' ? 'bg-[#EBF3FF] text-[#0131FD]' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <ShieldCheck size={18} className="text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Sécurité & qualité</div>
+                      <div className="text-[11px] text-slate-500">Zéro accident & Norme EN 197-1</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Carrières ▾ (clic libellé = /carrieres, chevron = sous-menu) */}
+          {/* Carrières ▾ */}
           <div
             className="relative flex items-center"
             onMouseEnter={() => setActiveDropdown('careers')}
             onMouseLeave={() => setActiveDropdown(null)}
           >
+            {['careers', 'job-offers', 'internships', 'apply'].includes(currentPage) && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
             <button
               type="button"
               onClick={() => handleNavClick('careers')}
               className={`px-1.5 2xl:px-2 py-1 2xl:py-1.5 rounded-l-lg transition whitespace-nowrap ${
                 ['careers', 'job-offers', 'internships', 'apply'].includes(currentPage)
-                  ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                  : 'hover:text-[#0B1F3A] hover:bg-slate-50'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               Carrières
@@ -384,75 +468,94 @@ export const Header: React.FC<HeaderProps> = ({
               aria-haspopup="menu"
               aria-label="Sous-menu Carrières"
               className={`p-1 2xl:p-1.5 rounded-r-lg transition ${
-                activeDropdown === 'careers' ? 'text-[#0131FD] bg-slate-100' : 'text-slate-500 hover:text-[#0B1F3A] hover:bg-slate-50'
+                activeDropdown === 'careers'
+                  ? 'text-[#0131FD]'
+                  : ['careers', 'job-offers', 'internships', 'apply'].includes(currentPage)
+                  ? 'text-[#0131FD]'
+                  : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               <CaretDown size={11} weight="bold" className={activeDropdown === 'careers' ? 'rotate-180 text-[#0131FD]' : ''} />
             </button>
 
-            {activeDropdown === 'careers' && (
-              <div className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('careers')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+            <AnimatePresence>
+              {activeDropdown === 'careers' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                  transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                 >
-                  <Briefcase size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Hub Carrières</div>
-                    <div className="text-[11px] text-slate-500">Chiffres RH & culture</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('job-offers')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <HardHat size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Offres d'emploi</div>
-                    <div className="text-[11px] text-slate-500">Postes en CDI / CDD</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('internships')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <GraduationCap size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Stages & Étudiants</div>
-                    <div className="text-[11px] text-slate-500">PFE & Stages tremplin</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('apply')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <PaperPlaneTilt size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Candidature spontanée</div>
-                    <div className="text-[11px] text-slate-500">Rejoindre le vivier talents</div>
-                  </div>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('careers')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Briefcase size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Hub Carrières</div>
+                      <div className="text-[11px] text-slate-500">Chiffres RH & culture</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('job-offers')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <HardHat size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Offres d'emploi</div>
+                      <div className="text-[11px] text-slate-500">Postes en CDI / CDD</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('internships')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <GraduationCap size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Stages & Étudiants</div>
+                      <div className="text-[11px] text-slate-500">PFE & Stages tremplin</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('apply')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <PaperPlaneTilt size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Candidature spontanée</div>
+                      <div className="text-[11px] text-slate-500">Rejoindre le vivier talents</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Actualités ▾ (clic libellé = /actualites, chevron = sous-menu) */}
+          {/* Actualités ▾ */}
           <div
             className="relative flex items-center"
             onMouseEnter={() => setActiveDropdown('news')}
             onMouseLeave={() => setActiveDropdown(null)}
           >
+            {['news', 'communiques', 'events'].includes(currentPage) && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
             <button
               type="button"
               onClick={() => handleNavClick('news')}
               className={`px-1.5 2xl:px-2 py-1 2xl:py-1.5 rounded-l-lg transition whitespace-nowrap ${
                 ['news', 'communiques', 'events'].includes(currentPage)
-                  ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                  : 'hover:text-[#0B1F3A] hover:bg-slate-50'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               Actualités
@@ -464,76 +567,106 @@ export const Header: React.FC<HeaderProps> = ({
               aria-haspopup="menu"
               aria-label="Sous-menu Actualités"
               className={`p-1 2xl:p-1.5 rounded-r-lg transition ${
-                activeDropdown === 'news' ? 'text-[#0131FD] bg-slate-100' : 'text-slate-500 hover:text-[#0B1F3A] hover:bg-slate-50'
+                activeDropdown === 'news'
+                  ? 'text-[#0131FD]'
+                  : ['news', 'communiques', 'events'].includes(currentPage)
+                  ? 'text-[#0131FD]'
+                  : 'text-slate-500 hover:text-[#0131FD] hover:bg-slate-50/80'
               }`}
             >
               <CaretDown size={11} weight="bold" className={activeDropdown === 'news' ? 'rotate-180 text-[#0131FD]' : ''} />
             </button>
 
-            {activeDropdown === 'news' && (
-              <div className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('news')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+            <AnimatePresence>
+              {activeDropdown === 'news' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                  transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 w-60 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                 >
-                  <Newspaper size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Dernières actualités</div>
-                    <div className="text-[11px] text-slate-500">Vie de l'entreprise</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('communiques')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <FileText size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Communiqués officiels</div>
-                    <div className="text-[11px] text-slate-500">Notes & déclarations</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('events')}
-                  className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
-                >
-                  <HardHat size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
-                  <div>
-                    <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Événements</div>
-                    <div className="text-[11px] text-slate-500">Salons & Rencontres</div>
-                  </div>
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('news')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <Newspaper size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Dernières actualités</div>
+                      <div className="text-[11px] text-slate-500">Vie de l'entreprise</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('communiques')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <FileText size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Communiqués officiels</div>
+                      <div className="text-[11px] text-slate-500">Notes & déclarations</div>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick('events')}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 flex items-center gap-3 group transition"
+                  >
+                    <HardHat size={18} className="text-[#0B1F3A] group-hover:text-[#0131FD]" />
+                    <div>
+                      <div className="text-xs font-bold text-[#0B1F3A] group-hover:text-[#0131FD]">Événements</div>
+                      <div className="text-[11px] text-slate-500">Salons & Rencontres</div>
+                    </div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Où acheter */}
-          <button
-            type="button"
-            onClick={() => handleNavClick('outlets')}
-            className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
-              currentPage === 'outlets'
-                ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                : 'hover:text-[#0B1F3A] hover:bg-slate-50'
-            }`}
-          >
-            Où acheter
-          </button>
+          <div className="relative inline-flex items-center">
+            {currentPage === 'outlets' && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => handleNavClick('outlets')}
+              className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
+                currentPage === 'outlets'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
+              }`}
+            >
+              Où acheter
+            </button>
+          </div>
 
           {/* Contact */}
-          <button
-            type="button"
-            onClick={() => handleNavClick('contact')}
-            className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
-              currentPage === 'contact'
-                ? 'text-[#0B1F3A] bg-slate-100 font-bold'
-                : 'hover:text-[#0B1F3A] hover:bg-slate-50'
-            }`}
-          >
-            Contact
-          </button>
+          <div className="relative inline-flex items-center">
+            {currentPage === 'contact' && (
+              <motion.span
+                layoutId="navActivePill"
+                className="absolute inset-0 bg-[#EBF3FF] rounded-lg -z-10"
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => handleNavClick('contact')}
+              className={`px-1.5 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg transition whitespace-nowrap ${
+                currentPage === 'contact'
+                  ? 'text-[#0131FD] font-bold'
+                  : 'hover:text-[#0131FD] hover:bg-slate-50/80'
+              }`}
+            >
+              Contact
+            </button>
+          </div>
         </nav>
 
         {/* Right Action Utilities (Search, Cart, Client Auth, CTA Devis, Burger) */}
@@ -583,53 +716,61 @@ export const Header: React.FC<HeaderProps> = ({
                 <CaretDown size={11} weight="bold" className={userDropdownOpen ? 'rotate-180' : ''} />
               </button>
 
-              {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-2 border-b border-slate-100">
-                    <p className="text-xs font-bold text-[#0B1F3A] truncate">
-                      {profile?.prenom ? `${profile.prenom} ${profile.nom}` : user.email}
-                    </p>
-                    <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('espace-client')}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
+              <AnimatePresence>
+                {userDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                    transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-2 z-50 overflow-hidden"
                   >
-                    <UserCircle size={16} className="text-[#0B1F3A]" />
-                    <span>Mon espace client</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('espace-client', 'commandes')}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
-                  >
-                    <ShoppingCart size={16} className="text-[#0B1F3A]" />
-                    <span>Mes commandes</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavClick('espace-client', 'profil')}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
-                  >
-                    <User size={16} className="text-[#0B1F3A]" />
-                    <span>Mon profil</span>
-                  </button>
-                  <div className="border-t border-slate-100 my-1" />
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setUserDropdownOpen(false);
-                      await signOut();
-                      handleNavClick('home');
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition"
-                  >
-                    <SignOut size={16} />
-                    <span>Se déconnecter</span>
-                  </button>
-                </div>
-              )}
+                    <div className="px-3 py-2 border-b border-slate-100">
+                      <p className="text-xs font-bold text-[#0B1F3A] truncate">
+                        {profile?.prenom ? `${profile.prenom} ${profile.nom}` : user.email}
+                      </p>
+                      <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick('espace-client')}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
+                    >
+                      <UserCircle size={16} className="text-[#0B1F3A]" />
+                      <span>Mon espace client</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick('espace-client', 'commandes')}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
+                    >
+                      <ShoppingCart size={16} className="text-[#0B1F3A]" />
+                      <span>Mes commandes</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleNavClick('espace-client', 'profil')}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-50 text-slate-700 flex items-center gap-2.5 transition"
+                    >
+                      <User size={16} className="text-[#0B1F3A]" />
+                      <span>Mon profil</span>
+                    </button>
+                    <div className="border-t border-slate-100 my-1" />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setUserDropdownOpen(false);
+                        await signOut();
+                        handleNavClick('home');
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition"
+                    >
+                      <SignOut size={16} />
+                      <span>Se déconnecter</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             /* Disconnected: Distinct "Se connecter" (outline) and "S'inscrire" (filled) on desktop */
@@ -652,15 +793,17 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {/* Brand Blue B2B Quote Button (Primary Conversion CTA) */}
-          <button
-            type="button"
-            onClick={onOpenQuote}
-            className="hidden sm:inline-flex btn-primary px-2.5 2xl:px-3 py-1 2xl:py-1.5 text-[11px] 2xl:text-xs font-bold uppercase tracking-wider shadow-sm items-center gap-1 whitespace-nowrap"
-          >
-            <FileText size={14} weight="bold" />
-            <span className="hidden 2xl:inline">Demander un devis B2B</span>
-            <span className="2xl:hidden">Devis B2B</span>
-          </button>
+          <MagneticButton strength={8} className="hidden sm:inline-flex">
+            <button
+              type="button"
+              onClick={onOpenQuote}
+              className="btn-primary px-2.5 2xl:px-3 py-1 2xl:py-1.5 text-[11px] 2xl:text-xs font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 whitespace-nowrap"
+            >
+              <FileText size={14} weight="bold" />
+              <span className="hidden 2xl:inline">Demander un devis B2B</span>
+              <span className="2xl:hidden">Devis B2B</span>
+            </button>
+          </MagneticButton>
 
           {/* Mobile Hamburger Button (visible under 1280px / xl) */}
           <button
