@@ -1,0 +1,417 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum OrderStatus {
+  EN_ATTENTE
+  CONFIRMEE
+  EN_PREPARATION
+  EN_LIVRAISON
+  LIVREE
+  ANNULEE
+}
+
+enum QuoteStatus {
+  NOUVEAU
+  EN_COURS
+  TRAITE
+  REFUSE
+}
+
+enum JobType {
+  EMPLOI_CDI
+  EMPLOI_CDD
+  STAGE_ACADEMIQUE
+  STAGE_PROFESSIONNEL
+  ALTERNANCE
+  CANDIDATURE_SPONTANEE
+}
+
+enum JobStatus {
+  BROUILLON
+  PUBLIEE
+  CLOTUREE
+}
+
+enum ApplicationStatus {
+  RECUE
+  EN_REVUE
+  ENTRETIEN
+  ACCEPTEE
+  REFUSEE
+}
+
+enum PublishStatus {
+  BROUILLON
+  PUBLIE
+  ARCHIVE
+}
+
+model User {
+  id                  String                   @id @default(uuid())
+  email               String                   @unique
+  password            String
+  nom                 String
+  prenom              String
+  telephone           String
+  entreprise          String?
+  role                Role                     @default(CLIENT)
+  isActive            Boolean                  @default(true)
+  emailVerifie        Boolean                  @default(false)
+  failedLoginAttempts Int                      @default(0)
+  lockedUntil         DateTime?
+  orders              Order[]
+  notifications       Notification[]
+  messages            OrderMessage[]
+  refreshTokens       RefreshToken[]
+  emailTokens         EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  auditLogs           AuditLog[]
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  @@index([role])
+  @@index([email])
+}
+
+model Product {
+  id            String      @id @default(uuid())
+  slug          String      @unique
+  name          String
+  shortGrade    String
+  classe        String
+  designation   String
+  targetUse     String      @db.Text
+  description   String      @db.Text
+  resistance2d  String
+  resistance28d String
+  packaging     String
+  unit          String      @default("sacs")
+  unitPrice     Int         @default(0)
+  priceDisplay  String
+  standard      String
+  isFeatured    Boolean     @default(false)
+  isRecommended Boolean     @default(false)
+  nouveau       Boolean     @default(false)
+  badge         String?
+  image         String
+  gallery       Json?
+  technicalData Json?
+  pdfName       String?
+  pdfUrl        String?
+  order         Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
+
+  @@index([isFeatured])
+  @@index([order])
+}
+
+model Order {
+  id                     String         @id @default(uuid())
+  numeroCommande         String         @unique
+  userId                 String
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statut                 OrderStatus    @default(EN_ATTENTE)
+  montantTotal           Int
+  modePaiement           String
+  modeLivraison          String
+  adresseLivraison       Json?
+  dateLivraisonSouhaitee String?
+  notes                  String?        @db.Text
+  telephoneReception     String?
+  items                  OrderItem[]
+  events                 OrderEvent[]
+  messages               OrderMessage[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([statut])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  nomProduit   String
+  quantite     Int
+  prixUnitaire Int
+  prixTotal    Int
+  createdAt    DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderEvent {
+  id          String      @id @default(uuid())
+  orderId     String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  statut      OrderStatus
+  description String      @db.Text
+  auteurRole  String      @default("system")
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+model OrderMessage {
+  id            String   @id @default(uuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  expediteur    String   // "client" | "admin"
+  expediteurNom String
+  message       String   @db.Text
+  lu            Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([orderId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titre     String
+  message   String   @db.Text
+  type      String   @default("info")
+  lu        Boolean  @default(false)
+  lien      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([lu])
+}
+
+model Quote {
+  id          String      @id @default(uuid())
+  nom         String
+  telephone   String
+  email       String?
+  produit     String
+  quantite    String
+  unite       String      @default("sacs")
+  departement String
+  commune     String
+  siteDetails String?     @db.Text
+  message     String?     @db.Text
+  statut      QuoteStatus @default(NOUVEAU)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([statut])
+  @@index([createdAt])
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  nom       String
+  email     String
+  sujet     String
+  message   String   @db.Text
+  lu        Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([lu])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id                  String    @id @default(uuid())
+  tokenHash           String    @unique
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked             Boolean   @default(false)
+  expiresAt           DateTime
+  replacedByTokenHash String?
+  createdAt           DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  adminId        String?
+  admin          User?    @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  action         String
+  targetResource String
+  targetId       String?
+  details        Json?
+  ipAddress      String?
+  createdAt      DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model JobOffer {
+  id           String        @id @default(uuid())
+  slug         String        @unique
+  titre        String
+  type         JobType
+  secteur      String
+  lieu         String        @default("Massé (Adja-Ouèrè)")
+  description  String        @db.Text
+  missions     String        @db.Text
+  profil       String        @db.Text
+  competences  Json?
+  duree        String?
+  dateLimite   DateTime?
+  statut       JobStatus     @default(PUBLIEE)
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([statut])
+  @@index([type])
+  @@index([secteur])
+}
+
+model Application {
+  id                   String            @id @default(uuid())
+  reference            String            @unique
+  jobOfferId           String?
+  jobOffer             JobOffer?         @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+  nom                  String
+  prenom               String
+  email                String
+  telephone            String
+  ville                String
+  pays                 String            @default("Bénin")
+  nationalite          String            @default("Béninoise")
+  typeCandidature      JobType
+  secteur              String
+  niveauEtude          String
+  etablissement        String
+  filiere              String
+  diplomeAnnee         String?
+  stageDuree           String?
+  stageDatesDispo      String?
+  conventionStage      Boolean           @default(false)
+  stageTuteur          String?
+  anneesExperience     String?
+  dernierPoste         String?
+  disponibilite        String?
+  pretentionsSalariales String?
+  permis               String?
+  langues              String?
+  linkedinUrl          String?
+  lettreMotivation     String?           @db.Text
+  statut               ApplicationStatus @default(RECUE)
+  noteInterne          String?           @db.Text
+  cvFileName           String
+  cvOriginalName       String
+  cvMimeType           String
+  cvSize               Int
+  cvPath               String
+  files                ApplicationFile[]
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([statut])
+  @@index([typeCandidature])
+  @@index([secteur])
+  @@index([email])
+}
+
+model ApplicationFile {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  fileName      String
+  originalName  String
+  mimeType      String
+  size          Int
+  filePath      String
+  fileType      String      @default("AUTRE")
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId])
+}
+
+model Communique {
+  id        String        @id @default(uuid())
+  slug      String        @unique
+  titre     String
+  categorie String        @default("Direction Générale")
+  date      DateTime      @default(now())
+  resume    String        @db.Text
+  contenu   String        @db.Text
+  pdfUrl    String?
+  pdfName   String?
+  statut    PublishStatus @default(PUBLIE)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([statut])
+  @@index([date])
+}
+
+model Event {
+  id          String        @id @default(uuid())
+  slug        String        @unique
+  titre       String
+  type        String        @default("Conférence")
+  dateDebut   DateTime
+  dateFin     DateTime?
+  lieu        String
+  ville       String        @default("Massé")
+  lat         Float?
+  lng         Float?
+  resume      String        @db.Text
+  description String        @db.Text
+  image       String?
+  statut      PublishStatus @default(PUBLIE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([statut])
+  @@index([dateDebut])
+}
+
+
