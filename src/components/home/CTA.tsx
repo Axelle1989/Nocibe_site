@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, PhoneCall } from '@phosphor-icons/react';
+import { MagneticButton } from '../motion/MagneticButton';
 
 interface CTAProps {
   onOpenQuote: () => void;
@@ -37,14 +38,16 @@ export const CTA: React.FC<CTAProps> = ({ onOpenQuote, onNavigateContact }) => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <button
-                type="button"
-                onClick={onOpenQuote}
-                className="w-full sm:w-auto btn-primary px-8 py-4 text-xs font-bold uppercase tracking-wider shadow-xl flex items-center justify-center gap-2.5"
-              >
-                <span>Demander un devis B2B</span>
-                <ArrowRight size={16} weight="bold" />
-              </button>
+              <MagneticButton strength={8} className="w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={onOpenQuote}
+                  className="w-full sm:w-auto btn-primary px-8 py-4 text-xs font-bold uppercase tracking-wider shadow-xl flex items-center justify-center gap-2.5"
+                >
+                  <span>Demander un devis B2B</span>
+                  <ArrowRight size={16} weight="bold" />
+                </button>
+              </MagneticButton>
 
               <button
                 type="button"
