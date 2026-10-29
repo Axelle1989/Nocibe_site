@@ -71,7 +71,7 @@ nocibe_benin/
 │   │   ├── routes/             # Routes REST (auth, products, orders, quotes, contact)
 │   │   └── index.ts            # Point d'entrée du serveur Express
 │   └── package.json            # Dépendances API (Express, Prisma, bcryptjs, zod)
-├── vercel.json                 # Configuration SPA et en-têtes HTTP de sécurité
+├── netlify.toml                # Configuration SPA Netlify et en-têtes HTTP de sécurité
 └── package.json                # Dépendances et scripts de build
 ```
 
