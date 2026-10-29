@@ -1,0 +1,66 @@
+# Configuration Netlify — NOCIBÉ
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Redirections permanentes SEO (pages fusionnées)
+[[redirects]]
+  from = "/mot-du-directeur"
+  to = "/histoire#mot-du-directeur"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/nos-valeurs"
+  to = "/equipe-direction#valeurs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/caracteristiques-techniques"
+  to = "/produits#specifications"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/partenaires"
+  to = "/realisations"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/grands-chantiers"
+  to = "/realisations"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/developpement-durable"
+  to = "/objectifs-2030#developpement-durable"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/engagements-rse"
+  to = "/objectifs-2030#developpement-durable"
+  status = 301
+  force = true
+
+# Règle SPA fallback pour React Router (toutes les routes vers index.html)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# En-têtes HTTP de sécurité stricts
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.tile.openstreetmap.org; connect-src 'self' http://localhost:4000 http://127.0.0.1:4000 https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.nocibe.bj; frame-ancestors 'none';"
