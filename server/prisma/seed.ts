@@ -9,7 +9,13 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Initialisation (Seed) de la base de données PostgreSQL NOCIBÉ...');
 
+  const isProduction = process.env.NODE_ENV === 'production';
   const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@nocibe.bj';
+
+  if (isProduction && !process.env.SEED_ADMIN_PASSWORD) {
+    throw new Error('❌ SÉCURITÉ: En environnement de production, la variable SEED_ADMIN_PASSWORD doit obligatoirement être définie et sécurisée.');
+  }
+
   const adminPasswordPlain = process.env.SEED_ADMIN_PASSWORD || 'Nocibe2026!AdminSecurise#BJ';
   const clientEmail = process.env.SEED_DEMO_EMAIL || 'client@entreprise.bj';
   const clientPasswordPlain = process.env.SEED_DEMO_PASSWORD || 'Nocibe2026!ClientSecurise#BJ';
