@@ -20,35 +20,21 @@ Ce document présente les mesures de sécurité mises en œuvre sur la plateform
 
 ---
 
-## 🌐 2. En-têtes HTTP de Sécurité (`vercel.json`)
+## 🌐 2. En-têtes HTTP de Sécurité (`netlify.toml`)
 
-Le fichier de configuration du déploiement impose les en-têtes stricts suivants sur l'ensemble des réponses HTTP :
+Le fichier de configuration du déploiement (`netlify.toml`) impose les en-têtes stricts suivants sur l'ensemble des réponses HTTP :
 
-```json
-{
-  "key": "Content-Security-Policy",
-  "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob: https://*.tile.openstreetmap.org; connect-src 'self' https://router.project-osrm.org; frame-ancestors 'none';"
-},
-{
-  "key": "Strict-Transport-Security",
-  "value": "max-age=63072000; includeSubDomains; preload"
-},
-{
-  "key": "X-Frame-Options",
-  "value": "DENY"
-},
-{
-  "key": "X-Content-Type-Options",
-  "value": "nosniff"
-},
-{
-  "key": "Referrer-Policy",
-  "value": "strict-origin-when-cross-origin"
-},
-{
-  "key": "Permissions-Policy",
-  "value": "camera=(), microphone=(), geolocation=()"
-}
+```toml
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.tile.openstreetmap.org; connect-src 'self' http://localhost:4000 http://127.0.0.1:4000 https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.nocibe.bj; frame-ancestors 'none';"
 ```
 
 ### Bénéfices :
