@@ -40,7 +40,7 @@ def get_message(file_path, status):
         return f"feat(lib): {action} {base}"
     elif file_path.startswith("scripts/"):
         return f"chore(scripts): {action} {base}"
-    elif file_path in ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts", "netlify.toml", "vercel.json"]:
+    elif file_path in ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts", "netlify.toml"]:
         return f"chore(config): {action} {base}"
     else:
         return f"chore: {action} {base}"
