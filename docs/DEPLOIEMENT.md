@@ -1,7 +1,7 @@
 # 🚀 Guide de Déploiement en Production — NOCIBÉ
 
 Ce guide décrit le déploiement en production de la plateforme NOCIBÉ :
-- **Frontend** : React 19 + Vite hébergé sur **Vercel** (ou Netlify / Cloudflare Pages).
+- **Frontend** : React 19 + Vite hébergé sur **Netlify**.
 - **Backend API** : Node.js / Express hébergé sur un PaaS (ex. **Render**, **Railway**, ou un serveur VPS).
 - **Base de données** : **PostgreSQL** géré (ex. **Neon**, **Railway**, ou service managé cloud) via **Prisma ORM**.
 
@@ -10,7 +10,7 @@ Ce guide décrit le déploiement en production de la plateforme NOCIBÉ :
 ## 📋 Prérequis
 - Un compte Git ([GitHub](https://github.com) ou [GitLab](https://gitlab.com)).
 - Une instance PostgreSQL managée avec accès `DATABASE_URL` et `DIRECT_URL`.
-- Un compte [Vercel](https://vercel.com) pour le frontend.
+- Un compte [Netlify](https://www.netlify.com) pour le frontend.
 - Une plateforme d'hébergement Node.js (ex: Render, Railway, VPS) pour le dossier `server/`.
 - Un nom de domaine officiel (ex : `nocibe.bj`).
 
@@ -69,16 +69,18 @@ Renseignez les variables suivantes dans le panneau d'administration de votre hé
 
 ---
 
-## ☁️ Étape 3 : Déploiement Frontend sur Vercel
+## ☁️ Étape 3 : Déploiement Frontend sur Netlify
 
 ### 3.1 Importer le dépôt Git
-1. Connectez-vous sur Vercel et importez le dépôt du projet.
-2. Définissez le framework sur **Vite**.
-3. Commande de build : `npm run build`
-4. Répertoire de sortie : `dist`
+1. Connectez-vous sur **Netlify** et cliquez sur **Add new site > Import an existing project**.
+2. Sélectionnez le dépôt GitHub de NOCIBÉ.
+3. Paramètres de compilation détectés automatiquement via `netlify.toml` :
+   - **Build command** : `npm run build`
+   - **Publish directory** : `dist`
+4. Les redirections SPA (`/* -> /index.html`) et les en-têtes de sécurité HTTP sont appliqués automatiquement par le fichier `netlify.toml` à la racine.
 
 ### 3.2 Variables d'environnement Frontend
-Ajoutez la variable d'URL d'API pointant vers le serveur déployé à l'étape 2 :
+Dans le panneau **Site configuration > Environment variables** de Netlify, ajoutez :
 
 | Nom de la variable | Description | Exemple |
 | :--- | :--- | :--- |
@@ -89,4 +91,4 @@ Ajoutez la variable d'URL d'API pointant vers le serveur déployé à l'étape 2
 ## 🔒 Étape 4 : Vérification Finale & Sécurité
 1. Tester la route de santé : `GET https://api.nocibe.bj/api/health` → doit retourner `{"status":"ok","database":"connected (postgresql)"}`.
 2. Vérifier que les requêtes CORS depuis des domaines non autorisés sont refusées.
-3. Valider le chargement HTTPS et les en-têtes CSP/HSTS via les headers définis dans `vercel.json`.
+3. Valider le chargement HTTPS et les en-têtes CSP/HSTS via les headers configurés dans `netlify.toml`.
