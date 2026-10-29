@@ -12,7 +12,7 @@ def run(cmd, check=True):
 
 def get_message(file_path, status):
     base = os.path.basename(file_path)
-    action = "update" if "M" in status else "add"
+    action = "remove" if "D" in status else ("update" if "M" in status else "add")
     
     if file_path.startswith("docs/"):
         return f"docs: {action} {base}"
@@ -40,7 +40,7 @@ def get_message(file_path, status):
         return f"feat(lib): {action} {base}"
     elif file_path.startswith("scripts/"):
         return f"chore(scripts): {action} {base}"
-    elif file_path in ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts"]:
+    elif file_path in ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts", "netlify.toml", "vercel.json"]:
         return f"chore(config): {action} {base}"
     else:
         return f"chore: {action} {base}"
@@ -53,6 +53,8 @@ def main():
     for line in lines:
         status = line[:2]
         file_path = line[3:].strip()
+        if file_path.startswith('"') and file_path.endswith('"'):
+            file_path = file_path[1:-1]
         # Security sanity check
         if file_path.endswith(".env") or file_path == ".env" or file_path.endswith("/.env"):
             print(f"Skipping secret file: {file_path}")
@@ -64,9 +66,12 @@ def main():
     
     for idx, (file_path, status) in enumerate(files_to_commit, 1):
         msg = get_message(file_path, status)
-        run(["git", "add", file_path])
+        if "D" in status and not os.path.exists(file_path):
+            run(["git", "rm", "-f", file_path])
+        else:
+            run(["git", "add", file_path])
         run(["git", "commit", "-m", msg])
-        if idx % 20 == 0 or idx == total:
+        if idx % 10 == 0 or idx == total:
             print(f"[{idx}/{total}] Committed {file_path}: {msg}")
             
     print(f"\nAll {total} files committed successfully.")
